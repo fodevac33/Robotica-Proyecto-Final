@@ -1,19 +1,15 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# build_robot.sh  – úsalo con:  source build_robot.sh
 
-WORKSPACE=$(dirname "$(realpath "$0")")
-
-echo "[1/4] Cleaning build/install/log..."
-rm -rf "$WORKSPACE/build" "$WORKSPACE/install" "$WORKSPACE/log"
-
-echo "[2/4] Building with symlink install..."
-colcon build --symlink-install
-
-if [ $? -ne 0 ]; then
-  echo "[!] Build failed."
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  echo "✖️  Ejecuta este script con:  source build_robot.sh"
   exit 1
 fi
 
-echo "[3/4] Sourcing workspace..."
-source "$WORKSPACE/install/setup.bash"
+WORKSPACE=$(dirname "$(realpath "${BASH_SOURCE[0]}")")
 
-echo "[4/4] Done! Workspace built and sourced."
+echo "[1/2] Build workspace…"
+colcon build --symlink-install
+echo "[2/2] Source overlay…"
+source "$WORKSPACE/install/setup.bash"
+echo "✔️  Overlay listo en esta terminal."
