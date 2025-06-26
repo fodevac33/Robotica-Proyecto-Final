@@ -153,7 +153,11 @@ ros2 launch lidar_bot_unal spawn_sim.launch.py   # Gazebo
 
 ---
 
-## 8. Roadmap
+## 8. Diagrama
+
+![Arquitectura](Arquitectura.svg)
+
+## 9. Roadmap
 
 | Semana | Objetivo                                                         | Estado |
 |--------|------------------------------------------------------------------|--------|
