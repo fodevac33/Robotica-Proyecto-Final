@@ -1,0 +1,32 @@
+########################
+# ROS 2 / colcon builds
+########################
+build/
+install/
+log/
+
+########################
+# Python / CMake caches
+########################
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.so
+
+# CMake artefacts fuera de build/
+CMakeCache.txt
+CMakeFiles/
+cmake-build-*/
+
+########################
+# Archivos temporales
+########################
+*.swp
+*.swo
+*~
+.DS_Store
+.idea/
+.vscode/
+*.bak
+*.orig
