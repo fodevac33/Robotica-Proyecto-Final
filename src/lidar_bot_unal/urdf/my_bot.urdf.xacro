@@ -1,17 +1,26 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="my_bot">
-  <!-- Parámetros globales -->
-  <xacro:property name="wheel_radius" value="0.05"/>
-  <xacro:property name="wheel_width"  value="0.02"/>
-  <xacro:property name="base_length"  value="0.30"/>
-  <xacro:property name="base_width"   value="0.30"/>
-  <xacro:property name="base_height"  value="0.08"/>
 
-  <!-- Material simple -->
+  <!-- =========================================================
+       PARÁMETROS GENERALES
+       ========================================================= -->
+  <xacro:property name="wheel_radius"     value="0.05"/>   <!-- 5 cm -->
+  <xacro:property name="wheel_width"      value="0.02"/>
+  <xacro:property name="base_length"      value="0.30"/>
+  <xacro:property name="base_width"       value="0.30"/>
+  <xacro:property name="base_height"      value="0.08"/>
+  <xacro:property name="wheel_separation" value="${base_width}"/>
+  <xacro:property name="wheel_diam"       value="${2*wheel_radius}"/>
+
+  <!-- =========================================================
+       MATERIALES
+       ========================================================= -->
   <material name="chassis_color"><color rgba="0.1 0.1 0.1 1"/></material>
   <material name="wheel_color"><color rgba="0.15 0.15 0.15 1"/></material>
 
-  <!-- Chasis -->
+  <!-- =========================================================
+       CHASIS
+       ========================================================= -->
   <link name="base_link">
     <visual>
       <geometry>
@@ -29,14 +38,13 @@
     <inertial>
       <mass value="4.0"/>
       <origin xyz="0 0 ${base_height/2}" rpy="0 0 0"/>
-      <inertia
-        ixx="0.02" ixy="0.0" ixz="0.0"
-        iyy="0.03" iyz="0.0"
-        izz="0.04"/>
+      <inertia ixx="0.02" ixy="0.0" ixz="0.0" iyy="0.03" iyz="0.0" izz="0.04"/>
     </inertial>
   </link>
 
-  <!-- Ruedas: izquierda y derecha -->
+  <!-- =========================================================
+       MACRO RUEDA
+       ========================================================= -->
   <xacro:macro name="wheel" params="side sign">
     <link name="${side}_wheel_link">
       <visual>
@@ -55,10 +63,8 @@
       <inertial>
         <mass value="0.5"/>
         <origin xyz="0 0 0" rpy="0 0 0"/>
-        <inertia
-          ixx="0.0005" ixy="0.0" ixz="0.0"
-          iyy="0.0005" iyz="0.0"
-          izz="0.001"/>
+        <inertia ixx="0.0005" ixy="0.0" ixz="0.0"
+                 iyy="0.0005" iyz="0.0" izz="0.001"/>
       </inertial>
     </link>
 
@@ -70,11 +76,13 @@
     </joint>
   </xacro:macro>
 
-  <!-- Instanciación -->
+  <!-- Instanciación de ruedas -->
   <xacro:wheel side="left"  sign=" 1"/>
   <xacro:wheel side="right" sign="-1"/>
 
-  <!-- Sensor LIDAR (Hokuyo) -->
+  <!-- =========================================================
+       SENSOR LIDAR
+       ========================================================= -->
   <link name="laser_link">
     <visual>
       <geometry>
@@ -90,4 +98,54 @@
     <child  link="laser_link"/>
     <origin xyz="0 0 ${base_height+0.05}" rpy="0 0 0"/>
   </joint>
+
+  <!-- =========================================================
+       PLUGINS GAZEBO
+       ========================================================= -->
+  <!-- Dif-Drive                                               -->
+  <gazebo>
+    <plugin name="diff_drive" filename="libgazebo_ros_diff_drive.so">
+      <left_joint>left_wheel_joint</left_joint>
+      <right_joint>right_wheel_joint</right_joint>
+      <wheel_separation>${wheel_separation}</wheel_separation>
+      <wheel_diameter>${wheel_diam}</wheel_diameter>
+      <publish_odom>true</publish_odom>
+      <odom_frame>odom</odom_frame>
+      <robot_base_frame>base_link</robot_base_frame>
+      <cmd_vel_topic>cmd_vel</cmd_vel_topic>
+      <odometry_topic>odom</odometry_topic>
+      <update_rate>50</update_rate>
+    </plugin>
+  </gazebo>
+
+  <!-- LIDAR como sensor ray   -->
+  <gazebo reference="laser_link">
+    <sensor type="ray" name="lidar">
+      <update_rate>20</update_rate>
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>720</samples>
+            <resolution>1</resolution>
+            <min_angle>-1.5708</min_angle>
+            <max_angle>1.5708</max_angle>
+          </horizontal>
+        </scan>
+        <range>
+          <min>0.12</min>
+          <max>6.0</max>
+        </range>
+      </ray>
+      <plugin name="gazebo_laser" filename="libgazebo_ros_ray_sensor.so">
+        <ros>
+          <!-- remapea la salida interna ~/out a /scan -->
+          <remapping>~/out:=scan</remapping>
+        </ros>
+        <!-- publica LaserScan en vez de PointCloud2 -->
+        <output_type>sensor_msgs/LaserScan</output_type>
+        <frame_name>laser_link</frame_name>
+      </plugin>
+    </sensor>
+  </gazebo>
+
 </robot>
