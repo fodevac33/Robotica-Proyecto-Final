@@ -153,16 +153,30 @@ ros2 launch lidar_bot_unal spawn_sim.launch.py   # Gazebo
 
 ---
 
-## 8. Diagrama
+## 8. Correr evasion
+
+Para correr el codigo de evasion primero iniciamos la simulacion de gazebo y despues llamamos el script:
+
+```bash
+ros2 launch lidar_bot_unal spawn_sim.launch.py
+```
+
+En una terminal aparte:
+
+```bash
+ros2 run lidar_bot_unal avoid.py
+```
+
+## 9. Diagrama
 
 ![Arquitectura](Arquitectura.svg)
 
-## 9. Roadmap
+## 10. Roadmap
 
 | Semana | Objetivo                                                         | Estado |
 |--------|------------------------------------------------------------------|--------|
 | 1      | Workspace + RViz mínimo                                          | ✔      |
 | 2      | Modelo URDF completo                                             | ✔      |
 | 3      | Plugins Gazebo (`diff_drive`, LIDAR `/scan`)                     | ✔      |
-| 4      | Nodo `my_bot_nav/avoid.py` para evasión automática de obstáculos | ☐      |
+| 4      | Nodo `scripts/avoid.py` para evasión automática de obstáculos    | ✔      |
 | 5      | Tuning de parámetros, demo final                                 | ☐      |

@@ -1,0 +1,42 @@
+flowchart TD
+  %% Workspace and Build
+  subgraph Build["Build System"]
+    CLI["Terminal / colcon"]
+    Xacro["xacro"]
+    URDF["URDF (robot model)"]
+    CLI --> Xacro --> URDF
+  end
+
+  %% Launch system
+  subgraph Launch["Launch System"]
+    Display["display.launch.py"]
+    Spawn["spawn_sim.launch.py"]
+    CLI --> Display
+    CLI --> Spawn
+  end
+
+  %% RViz Stack
+  subgraph RViz["RViz Stack"]
+    RSP["robot_state_publisher"]
+    JSP["joint_state_publisher"]
+    RV["RViz"]
+    Display --> RSP --> RV
+    Display --> JSP --> RV
+  end
+
+  %% Gazebo Stack
+  subgraph Sim["Gazebo Stack"]
+    Gazebo["Gazebo"]
+    Model["Spawned Robot"]
+    Scan["/scan"]
+    Odom["/odom"]
+    Cmd["/cmd_vel"]
+    Spawn --> Gazebo --> Model
+    Model --> Scan
+    Model --> Odom
+    Cmd --> Model
+  end
+
+  %% Shared topics
+  RV --> Scan
+  RV --> Odom
