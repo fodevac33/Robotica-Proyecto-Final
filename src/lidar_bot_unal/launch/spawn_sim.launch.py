@@ -10,12 +10,17 @@ def generate_launch_description():
     xacro_file = PathJoinSubstitution([pkg_share, 'urdf', 'my_bot.urdf.xacro'])
     robot_desc = Command(['xacro ', xacro_file])
 
+    world_file = PathJoinSubstitution([pkg_share, 'worlds', 'test_obstacles.world'])
+
     gz_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             PathJoinSubstitution(
-                [FindPackageShare('gazebo_ros'), 'launch', 'gazebo.launch.py'])
-        ),
-        launch_arguments={'pause': 'false', 'verbose': 'false'}.items()
+                [FindPackageShare('gazebo_ros'), 'launch', 'gazebo.launch.py'])),
+        launch_arguments={
+            'pause': 'false',
+            'verbose': 'false',
+            'world': world_file          
+        }.items()
     )
 
     spawn = Node(

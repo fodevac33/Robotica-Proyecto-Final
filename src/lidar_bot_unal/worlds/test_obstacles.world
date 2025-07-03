@@ -1,0 +1,43 @@
+<?xml version="1.0" ?>
+<sdf version="1.7">
+  <world name="default">
+
+    <!-- Standard lighting & physics (leave as default) -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <!-- Ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <!-- Box obstacles -->
+    <model name="box1">
+      <pose> 1  0 0.5  0 0 0</pose>   <!-- x y z roll pitch yaw -->
+      <link name="link">
+        <collision name="col">
+          <geometry><box><size>0.4 0.4 1.0</size></box></geometry>
+        </collision>
+        <visual name="vis">
+          <geometry><box><size>0.4 0.4 1.0</size></box></geometry>
+          <material><ambient>0.8 0.1 0.1 1</ambient></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="box2">
+      <pose>-1.2 0.8 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="col">
+          <geometry><box><size>0.6 0.3 1.0</size></box></geometry>
+        </collision>
+        <visual name="vis">
+          <geometry><box><size>0.6 0.3 1.0</size></box></geometry>
+          <material><ambient>0.1 0.1 0.8 1</ambient></material>
+        </visual>
+      </link>
+    </model>
+
+  </world>
+</sdf>
