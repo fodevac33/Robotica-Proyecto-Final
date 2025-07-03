@@ -118,5 +118,92 @@
       </link>
     </model>
 
+    <model name="box9_diagonal_wall">
+      <pose>2.0 -3.0 0.3 0 0 0.785</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>2.5 0.15 0.6</size></box></geometry></collision>
+        <visual name="vis">
+          <geometry><box><size>2.5 0.15 0.6</size></box></geometry>
+          <material><ambient>0.0 0.4 0.0 1</ambient></material> <!-- Dark Green -->
+        </visual>
+      </link>
+    </model>
+
+    <model name="box10_central_block">
+      <pose>-0.5 -0.5 0.2 0 0 0.2</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>0.4 0.4 0.4</size></box></geometry></collision>
+        <visual name="vis">
+          <geometry><box><size>0.4 0.4 0.4</size></box></geometry>
+          <material><ambient>0.9 0.9 0.9 1</ambient></material> <!-- White -->
+        </visual>
+      </link>
+    </model>
+
+    <model name="box11_far_pillar">
+      <pose>-0.5 3.5 0.8 0 0 0.3</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>0.5 0.5 1.6</size></box></geometry></collision>
+        <visual name="vis">
+          <geometry><box><size>0.5 0.5 1.6</size></box></geometry>
+          <material><ambient>0.5 0.0 1.0 1</ambient></material> <!-- Purple -->
+        </visual>
+      </link>
+    </model>
+
+    <model name="box12_speed_bump">
+      <pose>0.5 1.8 0.05 0 0 1.57</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>0.2 1.2 0.1</size></box></geometry></collision>
+        <visual name="vis">
+          <geometry><box><size>0.2 1.2 0.1</size></box></geometry>
+          <material><ambient>0.3 0.3 0.3 1</ambient></material> <!-- Dark Grey -->
+        </visual>
+      </link>
+    </model>
+
+    <model name="box13_far_cube">
+      <pose>3.5 3.5 0.5 0 0 1.0</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>1.0 1.0 1.0</size></box></geometry></collision>
+        <visual name="vis">
+          <geometry><box><size>1.0 1.0 1.0</size></box></geometry>
+          <material><ambient>1.0 0.7 0.8 1</ambient></material> <!-- Pink -->
+        </visual>
+      </link>
+    </model>
+
+    <model name="box14_back_wall">
+      <pose>-3.5 -3 0.4 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>0.2 2.5 0.8</size></box></geometry></collision>
+        <visual name="vis">
+          <geometry><box><size>0.2 2.5 0.8</size></box></geometry>
+          <material><ambient>0.6 0.4 0.2 1</ambient></material> <!-- Brown -->
+        </visual>
+      </link>
+    </model>
+
+    <model name="box15_corridor_block">
+      <pose>-1.8 -0.5 0.25 0 0 -0.4</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>0.5 0.5 0.5</size></box></geometry></collision>
+        <visual name="vis">
+          <geometry><box><size>0.5 0.5 0.5</size></box></geometry>
+          <material><ambient>0.0 0.5 0.5 1</ambient></material> <!-- Teal -->
+        </visual>
+      </link>
+    </model>
+
+    <model name="box16_another_pillar">
+      <pose>3.5 -2.0 0.9 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>0.3 0.3 1.8</size></box></geometry></collision>
+        <visual name="vis">
+          <geometry><box><size>0.3 0.3 1.8</size></box></geometry>
+          <material><ambient>0.9 0.6 0.1 1</ambient></material> <!-- Gold -->
+        </visual>
+      </link>
+    </model>
   </world>
 </sdf>
