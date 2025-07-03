@@ -12,9 +12,9 @@
       <uri>model://ground_plane</uri>
     </include>
 
-    <!-- Box obstacles -->
+    <!-- Original Box obstacles -->
     <model name="box1">
-      <pose> 1  0 0.5  0 0 0</pose>   <!-- x y z roll pitch yaw -->
+      <pose>1 0 0.5 0 0 0</pose>   <!-- x y z roll pitch yaw -->
       <link name="link">
         <collision name="col">
           <geometry><box><size>0.4 0.4 1.0</size></box></geometry>
@@ -35,6 +35,85 @@
         <visual name="vis">
           <geometry><box><size>0.6 0.3 1.0</size></box></geometry>
           <material><ambient>0.1 0.1 0.8 1</ambient></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Added Box obstacles -->
+    <model name="box3">
+      <pose>-2 -1.5 0.4 0 0 0.5</pose>
+      <link name="link">
+        <collision name="col">
+          <geometry><box><size>0.5 1.5 0.8</size></box></geometry>
+        </collision>
+        <visual name="vis">
+          <geometry><box><size>0.5 1.5 0.8</size></box></geometry>
+          <material><ambient>0.1 0.8 0.1 1</ambient></material> <!-- Green -->
+        </visual>
+      </link>
+    </model>
+
+    <model name="box4_tall_pillar">
+      <pose>2.5 2 0.6 0 0 0</pose>
+      <link name="link">
+        <collision name="col">
+          <geometry><box><size>0.2 0.2 1.2</size></box></geometry>
+        </collision>
+        <visual name="vis">
+          <geometry><box><size>0.2 0.2 1.2</size></box></geometry>
+          <material><ambient>0.8 0.8 0.1 1</ambient></material> <!-- Yellow -->
+        </visual>
+      </link>
+    </model>
+
+    <model name="box5_long_wall">
+      <pose>0 -2.5 0.2 0 0 1.57</pose>
+      <link name="link">
+        <collision name="col">
+          <geometry><box><size>2.0 0.2 0.4</size></box></geometry>
+        </collision>
+        <visual name="vis">
+          <geometry><box><size>2.0 0.2 0.4</size></box></geometry>
+          <material><ambient>0.1 0.8 0.8 1</ambient></material> <!-- Cyan -->
+        </visual>
+      </link>
+    </model>
+
+    <model name="box6_small_cube">
+      <pose>-2.5 1.5 0.15 0 0 0.2</pose>
+      <link name="link">
+        <collision name="col">
+          <geometry><box><size>0.3 0.3 0.3</size></box></geometry>
+        </collision>
+        <visual name="vis">
+          <geometry><box><size>0.3 0.3 0.3</size></box></geometry>
+          <material><ambient>0.8 0.1 0.8 1</ambient></material> <!-- Magenta -->
+        </visual>
+      </link>
+    </model>
+
+    <model name="box7_wide_block">
+      <pose>1.5 -1.5 0.25 0 0 -0.8</pose>
+      <link name="link">
+        <collision name="col">
+          <geometry><box><size>1.5 1.5 0.5</size></box></geometry>
+        </collision>
+        <visual name="vis">
+          <geometry><box><size>1.5 1.5 0.5</size></box></geometry>
+          <material><ambient>1.0 0.5 0.0 1</ambient></material> <!-- Orange -->
+        </visual>
+      </link>
+    </model>
+
+     <model name="box8">
+      <pose>3.0 -0.5 0.75 0 0 0.785</pose>
+      <link name="link">
+        <collision name="col">
+          <geometry><box><size>0.8 0.2 1.5</size></box></geometry>
+        </collision>
+        <visual name="vis">
+          <geometry><box><size>0.8 0.2 1.5</size></box></geometry>
+          <material><ambient>0.5 0.5 0.5 1</ambient></material> <!-- Grey -->
         </visual>
       </link>
     </model>

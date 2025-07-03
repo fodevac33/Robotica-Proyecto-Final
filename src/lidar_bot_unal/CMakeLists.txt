@@ -14,9 +14,16 @@ install(
     urdf
     launch
     rviz
-    worlds
+    worlds          
   DESTINATION
     share/${PROJECT_NAME}
+)
+
+install(
+  PROGRAMS
+    scripts/avoid.py
+  DESTINATION
+    lib/${PROJECT_NAME}
 )
 
 if(BUILD_TESTING)
