@@ -6,17 +6,20 @@
        ========================================================= -->
   <xacro:property name="wheel_radius"     value="0.05"/>   <!-- 5 cm -->
   <xacro:property name="wheel_width"      value="0.02"/>
-  <xacro:property name="base_length"      value="0.30"/>
+  <xacro:property name="base_length"      value="0.25"/>
   <xacro:property name="base_width"       value="0.30"/>
-  <xacro:property name="base_height"      value="0.08"/>
+  <xacro:property name="base_height"      value="0.06"/>
   <xacro:property name="wheel_separation" value="${base_width}"/>
   <xacro:property name="wheel_diam"       value="${2*wheel_radius}"/>
 
   <!-- =========================================================
        MATERIALES
        ========================================================= -->
-  <material name="chassis_color"><color rgba="0.1 0.1 0.1 1"/></material>
-  <material name="wheel_color"><color rgba="0.15 0.15 0.15 1"/></material>
+  <material name="chassis_color"><color rgba="0.3 0.5 0.8 1"/></material> 
+  <material name="lidar_color"><color rgba="1.0 0.5 0.5 1"/></material> 
+  <material name="wheel_color"><color rgba="0.6 0.6 0.6 1"/></material>
+
+
 
   <!-- =========================================================
        CHASIS
@@ -26,18 +29,18 @@
       <geometry>
         <box size="${base_length} ${base_width} ${base_height}"/>
       </geometry>
-      <origin xyz="0 0 ${base_height/2}" rpy="0 0 0"/>
+      <origin xyz="0 0 ${wheel_radius}" rpy="0 0 0"/>
       <material name="chassis_color"/>
     </visual>
     <collision>
       <geometry>
         <box size="${base_length} ${base_width} ${base_height}"/>
       </geometry>
-      <origin xyz="0 0 ${base_height/2}" rpy="0 0 0"/>
+      <origin xyz="0 0 ${wheel_radius}" rpy="0 0 0"/>
     </collision>
     <inertial>
       <mass value="4.0"/>
-      <origin xyz="0 0 ${base_height/2}" rpy="0 0 0"/>
+      <origin xyz="0 0 ${wheel_radius}" rpy="0 0 0"/>
       <inertia ixx="0.02" ixy="0.0" ixz="0.0" iyy="0.03" iyz="0.0" izz="0.04"/>
     </inertial>
   </link>
@@ -88,15 +91,15 @@
       <geometry>
         <cylinder length="0.02" radius="0.04"/>
       </geometry>
-      <origin xyz="0 0 ${base_height+0.05}" rpy="0 0 0"/>
-      <material name="chassis_color"/>
+      <origin xyz="0 0 ${base_height}" rpy="0 0 0"/>
+      <material name="lidar_color"/>
     </visual>
   </link>
 
   <joint name="laser_joint" type="fixed">
     <parent link="base_link"/>
     <child  link="laser_link"/>
-    <origin xyz="0 0 ${base_height+0.05}" rpy="0 0 0"/>
+    <origin xyz="0 0 ${base_height}" rpy="0 0 0"/>
   </joint>
 
   <!-- =========================================================
