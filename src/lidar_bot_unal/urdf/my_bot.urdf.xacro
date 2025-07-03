@@ -25,6 +25,7 @@
        CHASIS
        ========================================================= -->
   <link name="base_link">
+    <!-- Visual for the main body -->
     <visual>
       <geometry>
         <box size="${base_length} ${base_width} ${base_height}"/>
@@ -32,12 +33,25 @@
       <origin xyz="0 0 ${wheel_radius}" rpy="0 0 0"/>
       <material name="chassis_color"/>
     </visual>
+
+    <!-- Visual for the LiDAR support bracket (COSMETIC ONLY) -->
+    <visual name="lidar_support_visual">
+      <geometry>
+        <box size="0.035 0.05 0.09"/>
+      </geometry>
+      <origin xyz="${base_length/2} 0 ${base_height + 0.02}" rpy="0 0 0"/>
+      <material name="chassis_color"/>
+    </visual>
+
+    <!-- Collision for the main body (Unchanged) -->
     <collision>
       <geometry>
         <box size="${base_length} ${base_width} ${base_height}"/>
       </geometry>
       <origin xyz="0 0 ${wheel_radius}" rpy="0 0 0"/>
     </collision>
+    
+    <!-- Inertial properties (Unchanged) -->
     <inertial>
       <mass value="4.0"/>
       <origin xyz="0 0 ${wheel_radius}" rpy="0 0 0"/>
