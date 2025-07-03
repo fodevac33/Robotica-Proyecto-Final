@@ -70,6 +70,8 @@ class AvoidNode(Node):
             
             self.get_logger().info(f"SIDE CLEARANCE ISSUE (L:{left_corner_dist:.2f} R:{right_corner_dist:.2f}). Turning.")
             
+            cmd.angular.z = self.turn_speed if right_corner_dist < left_corner_dist else -self.turn_speed
+            
         else:
             cmd.linear.x = self.fwd_speed
             cmd.angular.z = 0.0
