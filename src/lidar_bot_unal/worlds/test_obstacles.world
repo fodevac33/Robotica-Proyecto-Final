@@ -346,5 +346,53 @@
         </visual>
       </link>
     </model>
+<!-- Pared trasera -->
+<model name="wall_back">
+  <pose>0 -5 0.5 0 0 0</pose>
+  <link name="link">
+    <collision name="col"><geometry><box><size>10 0.2 1.0</size></box></geometry></collision>
+    <visual name="vis">
+      <geometry><box><size>10 0.2 1.0</size></box></geometry>
+      <material><ambient>0.2 0.2 0.2 1</ambient></material>
+    </visual>
+  </link>
+</model>
+
+<!-- Pared delantera -->
+<model name="wall_front">
+  <pose>0 5 0.5 0 0 0</pose>
+  <link name="link">
+    <collision name="col"><geometry><box><size>10 0.2 1.0</size></box></geometry></collision>
+    <visual name="vis">
+      <geometry><box><size>10 0.2 1.0</size></box></geometry>
+      <material><ambient>0.2 0.2 0.2 1</ambient></material>
+    </visual>
+  </link>
+</model>
+
+<!-- Pared izquierda -->
+<model name="wall_left">
+  <pose>-5 0 0.5 0 0 0</pose>
+  <link name="link">
+    <collision name="col"><geometry><box><size>0.2 10 1.0</size></box></geometry></collision>
+    <visual name="vis">
+      <geometry><box><size>0.2 10 1.0</size></box></geometry>
+      <material><ambient>0.2 0.2 0.2 1</ambient></material>
+    </visual>
+  </link>
+</model>
+
+<!-- Pared derecha -->
+<model name="wall_right">
+  <pose>5 0 0.5 0 0 0</pose>
+  <link name="link">
+    <collision name="col"><geometry><box><size>0.2 10 1.0</size></box></geometry></collision>
+    <visual name="vis">
+      <geometry><box><size>0.2 10 1.0</size></box></geometry>
+      <material><ambient>0.2 0.2 0.2 1</ambient></material>
+    </visual>
+  </link>
+</model>
+
   </world>
 </sdf>

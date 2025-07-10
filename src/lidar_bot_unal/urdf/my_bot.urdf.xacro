@@ -28,9 +28,9 @@
     <!-- Visual for the main body -->
     <visual>
       <geometry>
-        <box size="${base_length} ${base_width} ${base_height}"/>
+        <box size="${base_length} ${base_width} ${base_height}" rpy="0 0 0"/>
       </geometry>
-      <origin xyz="0 0 ${wheel_radius}" rpy="0 0 0"/>
+      <origin xyz="0 0 ${wheel_radius + base_height/2}"/>
       <material name="chassis_color"/>
     </visual>
 
@@ -48,7 +48,7 @@
       <geometry>
         <box size="${base_length} ${base_width} ${base_height}"/>
       </geometry>
-      <origin xyz="0 0 ${wheel_radius}" rpy="0 0 0"/>
+      <origin xyz="0 0 ${wheel_radius + base_height/2}"/>
     </collision>
     
     <!-- Inertial properties (Unchanged) -->
@@ -62,40 +62,46 @@
   <!-- =========================================================
        MACRO RUEDA
        ========================================================= -->
-  <xacro:macro name="wheel" params="side sign">
-    <link name="${side}_wheel_link">
-      <visual>
-        <geometry>
-          <cylinder length="${wheel_width}" radius="${wheel_radius}"/>
-        </geometry>
-        <origin xyz="0 0 0" rpy="1.5708 0 0"/>
-        <material name="wheel_color"/>
-      </visual>
-      <collision>
-        <geometry>
-          <cylinder length="${wheel_width}" radius="${wheel_radius}"/>
-        </geometry>
-        <origin xyz="0 0 0" rpy="1.5708 0 0"/>
-      </collision>
-      <inertial>
-        <mass value="0.5"/>
-        <origin xyz="0 0 0" rpy="0 0 0"/>
-        <inertia ixx="0.0005" ixy="0.0" ixz="0.0"
-                 iyy="0.0005" iyz="0.0" izz="0.001"/>
-      </inertial>
-    </link>
+  <xacro:macro name="wheel" params="name x_offset y_offset">
+  <link name="${name}_link">
+    <visual>
+      <geometry>
+        <cylinder length="${wheel_width}" radius="${wheel_radius}"/>
+      </geometry>
+      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+      <material name="wheel_color"/>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder length="${wheel_width}" radius="${wheel_radius}"/>
+      </geometry>
+      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+    </collision>
+    <inertial>
+      <mass value="0.5"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="0.0005" ixy="0.0" ixz="0.0"
+               iyy="0.0005" iyz="0.0" izz="0.001"/>
+    </inertial>
+  </link>
 
-    <joint name="${side}_wheel_joint" type="continuous">
-      <parent link="base_link"/>
-      <child  link="${side}_wheel_link"/>
-      <origin xyz="0 ${sign*base_width/2} ${wheel_radius}" rpy="0 0 0"/>
-      <axis xyz="0 1 0"/>
-    </joint>
-  </xacro:macro>
+  <joint name="${name}_joint" type="continuous">
+    <parent link="base_link"/>
+    <child  link="${name}_link"/>
+    <origin xyz="${x_offset} ${y_offset} ${wheel_radius}" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+  </joint>
+</xacro:macro>
 
   <!-- Instanciación de ruedas -->
-  <xacro:wheel side="left"  sign=" 1"/>
-  <xacro:wheel side="right" sign="-1"/>
+  <!-- Ruedas delanteras -->
+<xacro:wheel name="front_left_wheel"  x_offset="${ base_length/2 - 0.05}" y_offset=" ${ base_width/2}" />
+<xacro:wheel name="front_right_wheel" x_offset="${ base_length/2 - 0.05}" y_offset="-${ base_width/2}" />
+
+<!-- Ruedas traseras -->
+<xacro:wheel name="rear_left_wheel"   x_offset="-${ base_length/2 - 0.05}" y_offset=" ${ base_width/2}" />
+<xacro:wheel name="rear_right_wheel"  x_offset="-${ base_length/2 - 0.05}" y_offset="-${ base_width/2}" />
+
 
   <!-- =========================================================
        SENSOR LIDAR
@@ -122,17 +128,29 @@
   <!-- Dif-Drive                                               -->
   <gazebo>
     <plugin name="diff_drive" filename="libgazebo_ros_diff_drive.so">
-      <left_joint>left_wheel_joint</left_joint>
-      <right_joint>right_wheel_joint</right_joint>
+
+      <!-- 1️⃣  Tell the plugin we have two wheel pairs -->
+      <num_wheel_pairs>2</num_wheel_pairs>
+
+      <!-- 2️⃣  List joints pair-by-pair -->
+      <!-- front pair -->
+      <left_joint>front_left_wheel_joint</left_joint>
+      <right_joint>front_right_wheel_joint</right_joint>
+
+      <!-- rear pair -->
+      <left_joint>rear_left_wheel_joint</left_joint>
+      <right_joint>rear_right_wheel_joint</right_joint>
+
+      <!-- 3️⃣  Kinematics (once is fine) -->
       <wheel_separation>${wheel_separation}</wheel_separation>
       <wheel_diameter>${wheel_diam}</wheel_diameter>
-      <publish_odom>true</publish_odom>
-      <odom_frame>odom</odom_frame>
-      <robot_base_frame>base_link</robot_base_frame>
+
+      <update_rate>50</update_rate>
       <cmd_vel_topic>cmd_vel</cmd_vel_topic>
       <odometry_topic>odom</odometry_topic>
-      <update_rate>50</update_rate>
+      <robot_base_frame>base_link</robot_base_frame>
     </plugin>
+
   </gazebo>
 
   <!-- LIDAR como sensor ray   -->
