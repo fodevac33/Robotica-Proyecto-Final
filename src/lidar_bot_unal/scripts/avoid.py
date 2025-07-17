@@ -67,10 +67,11 @@ class AvoidNode(Node):
         min_left = min([r for r in left_half if not math.isinf(r) and not math.isnan(r)] or [float('inf')])
 
         if min_fwd_dist < self.fwd_safe_dist:
-            # Objeto al frente — frenamos y giramos suavemente
             cmd.linear.x = 0.0
             self.get_logger().info(f"FORWARD OBSTACLE at {min_fwd_dist:.2f}m. Turning.")
-            if min_right < min_left:
+            if math.isinf(min_right) and math.isinf(min_left):
+                cmd.angular.z = self.turn_speed  
+            elif min_right < min_left:
                 cmd.angular.z = self.scale_turn_speed(min_right, self.fwd_safe_dist)
             else:
                 cmd.angular.z = -self.scale_turn_speed(min_left, self.fwd_safe_dist)
