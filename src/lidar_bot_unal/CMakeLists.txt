@@ -15,6 +15,7 @@ install(
     launch
     rviz
     worlds          
+    models
   DESTINATION
     share/${PROJECT_NAME}
 )
@@ -22,6 +23,8 @@ install(
 install(
   PROGRAMS
     scripts/avoid.py
+    scripts/obstacle_avoider.py 
+    scripts/snake_navigator.py
   DESTINATION
     lib/${PROJECT_NAME}
 )
