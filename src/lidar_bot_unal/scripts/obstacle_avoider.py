@@ -33,6 +33,14 @@ class ObstacleAvoiderNode(Node):
         
         self.get_logger().info("Obstacle Avoider ready and waiting for goal commands.")
 
+    def min_turn(self, val: float, minimum: float = 0.2) -> float:
+        """Guarantee at least a small nonzero turn magnitude so we don't stall."""
+        if val >= 0.0:
+            return max(val, minimum)
+        else:
+            return min(val, -minimum)
+
+
     def goal_cb(self, msg: Twist):
         self.goal_cmd = msg
 
@@ -65,21 +73,25 @@ class ObstacleAvoiderNode(Node):
 
         if min_fwd_dist < self.fwd_safe_dist:
             obstacle_detected = True
-            final_cmd.linear.x = 0.0 # Stop
-            # Turn away from closest obstacle
-            if min_right < min_left:
-                final_cmd.angular.z = self.base_turn_speed # Turn left
+            final_cmd.linear.x = 0.0  # Stop
+            if math.isinf(min_right) and math.isinf(min_left):
+                turn = self.base_turn_speed
+            elif min_right < min_left:
+                turn = self.base_turn_speed
             else:
-                final_cmd.angular.z = -self.base_turn_speed # Turn right
+                turn = -self.base_turn_speed
+            final_cmd.angular.z = self.min_turn(turn)
 
         elif left_corner_dist < self.side_safe_dist or right_corner_dist < self.side_safe_dist:
             obstacle_detected = True
-            # Slow down and turn away from the side obstacle
-            final_cmd.linear.x = self.goal_cmd.linear.x * 0.3 
-            if right_corner_dist < left_corner_dist:
-                final_cmd.angular.z = self.base_turn_speed * 0.8
+            final_cmd.linear.x = self.goal_cmd.linear.x * 0.3
+            if math.isinf(right_corner_dist) and math.isinf(left_corner_dist):
+                turn = self.base_turn_speed  # fallback left
+            elif right_corner_dist < left_corner_dist:
+                turn = self.base_turn_speed  # turn left away from right wall
             else:
-                final_cmd.angular.z = -self.base_turn_speed * 0.8
+                turn = -self.base_turn_speed  # turn right away from left wall
+            final_cmd.angular.z = self.min_turn(turn, minimum=0.15)
         
         # --- Blending Logic ---
         if obstacle_detected:
