@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-
+import numpy as np   # <-- añade esto en la cabecera
 import math
 import rclpy
 from rclpy.node import Node
