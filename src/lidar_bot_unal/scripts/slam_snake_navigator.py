@@ -22,8 +22,8 @@ class SlamSnakeNavigator(Node):
         self.declare_parameter('turn_speed_gain', 0.8)
         self.declare_parameter('world_bounds', [-4.5, 4.5])
         self.declare_parameter('exploration_radius', 2.0)
-        self.declare_parameter('stuck_threshold', 30)  # iterations
-        self.declare_parameter('stuck_distance', 0.5)  # meters
+        self.declare_parameter('stuck_threshold', 300)  # iterations
+        self.declare_parameter('stuck_distance', 0.75)  # meters
 
         self.goal_tolerance = self.get_parameter('goal_tolerance').value
         self.fwd_speed = self.get_parameter('fwd_speed').value
