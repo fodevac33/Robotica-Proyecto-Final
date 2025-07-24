@@ -48,84 +48,66 @@ class ObstacleAvoiderNode(Node):
             return min(val, -minimum)
 
     def scan_cb(self, msg: LaserScan):
+        # The goal command from the navigator
+        goal_cmd = self.goal_cmd
+
+        # --- Find the clearest path (the direction with the furthest laser reading) ---
+        # We replace NaN/inf with 0 so we can find the max range safely.
+        # A 0 range won't be chosen unless all ranges are 0.
+        ranges = np.array(msg.ranges)
+        ranges[np.isinf(ranges)] = msg.range_max + 1 # Treat inf as wide open space
+        ranges[np.isnan(ranges)] = 0.0 # Treat nan as an immediate obstacle
+
+        # The index of the laser scan with the longest range
+        best_index = np.argmax(ranges)
+        # The angle of that best opening
+        best_angle = msg.angle_min + best_index * msg.angle_increment
+
+        # --- Obstacle Detection in Front ---
+        fwd_cone_angle = 20 * math.pi / 180.0  # 20-degree cone
+        fwd_min_i = self.get_index_for_angle(-fwd_cone_angle / 2, msg)
+        fwd_max_i = self.get_index_for_angle(fwd_cone_angle / 2, msg)
+        min_fwd_dist = np.min(ranges[fwd_min_i:fwd_max_i])
+
+        # --- Decision Logic ---
         final_cmd = Twist()
         obstacle_detected = False
 
-        # --- Calculate obstacle metrics ---
-        fwd_cone_angle = 15 * math.pi / 180.0
-        fwd_min_i = self.get_index_for_angle(-fwd_cone_angle / 2, msg)
-        fwd_max_i = self.get_index_for_angle(fwd_cone_angle / 2, msg)
+        if min_fwd_dist < self.fwd_safe_dist:
+            # OBSTACLE DETECTED: Don't use the navigator's command.
+            # Instead, turn towards the best angle (the clearest path).
+            self.get_logger().info(f"Obstacle ahead! Turning towards opening at {best_angle:.2f} rad.", throttle_duration_sec=1.0)
+            obstacle_detected = True
 
-        fwd_sector = msg.ranges[fwd_min_i:fwd_max_i]
-        valid_fwd = [r for r in fwd_sector if not math.isinf(r) and not math.isnan(r)]
-        min_fwd_dist = min(valid_fwd) if valid_fwd else float('inf')
+            # Slow down significantly when turning away from an obstacle
+            final_cmd.linear.x = goal_cmd.linear.x * 0.2
+            
+            # Steer towards the opening
+            turn_error = self.normalize_angle(best_angle) # The "goal" is now the opening
+            final_cmd.angular.z = self.base_turn_speed * turn_error * 2.0 # Increase turn gain for escape
+            
+            # Ensure the robot always tries to turn out of trouble
+            if abs(final_cmd.angular.z) < 0.1:
+                final_cmd.angular.z = np.sign(turn_error) * 0.3
 
-        right_corner_idx = self.get_index_for_angle(-math.pi / 2, msg)
-        left_corner_idx  = self.get_index_for_angle(math.pi / 2, msg)
-        right_corner_dist = msg.ranges[right_corner_idx] if not (math.isinf(msg.ranges[right_corner_idx]) or math.isnan(msg.ranges[right_corner_idx])) else float('inf')
-        left_corner_dist  = msg.ranges[left_corner_idx]  if not (math.isinf(msg.ranges[left_corner_idx])  or math.isnan(msg.ranges[left_corner_idx]))  else float('inf')
-
-        center_idx = len(msg.ranges) // 2
-        min_right = min([r for r in msg.ranges[:center_idx] if not (math.isinf(r) or math.isnan(r))] or [float('inf')])
-        min_left  = min([r for r in msg.ranges[center_idx:] if not (math.isinf(r) or math.isnan(r))] or [float('inf')])
-
-        # DEBUG distances (1 Hz)
-        self.get_logger().info(
-            f"dist fwd={min_fwd_dist:.2f}  right={right_corner_dist:.2f}  left={left_corner_dist:.2f}  "
-            f"minR={min_right:.2f} minL={min_left:.2f}",
-            throttle_duration_sec=1.0
-        )
-
-        # --- Relax avoidance when navigator is creeping (near goal) ---
-        # If navigator linear command is tiny, trust it unless obstacle is extremely close.
-        if abs(self.goal_cmd.linear.x) < 0.05:
-            if min_fwd_dist < 0.10:
-                obstacle_detected = True
-                final_cmd.linear.x = 0.0
-                final_cmd.angular.z = self.min_turn(self.base_turn_speed)
-            else:
-                final_cmd = self.goal_cmd
         else:
-            # --- Forward obstacle branch ---
-            if min_fwd_dist < self.fwd_safe_dist:
-                obstacle_detected = True
-                final_cmd.linear.x = 0.0
-                if math.isinf(min_right) and math.isinf(min_left):
-                    turn = self.base_turn_speed
-                elif min_right < min_left:
-                    turn = self.base_turn_speed
-                else:
-                    turn = -self.base_turn_speed
-                final_cmd.angular.z = self.min_turn(turn)
+            # NO OBSTACLE: Pass the navigator's command through.
+            final_cmd = goal_cmd
 
-            # --- Side clearance branch ---
-            elif left_corner_dist < self.side_safe_dist or right_corner_dist < self.side_safe_dist:
-                obstacle_detected = True
-                final_cmd.linear.x = self.goal_cmd.linear.x * 0.3
-                if math.isinf(right_corner_dist) and math.isinf(left_corner_dist):
-                    turn = self.base_turn_speed
-                elif right_corner_dist < left_corner_dist:
-                    turn = self.base_turn_speed
-                else:
-                    turn = -self.base_turn_speed
-                final_cmd.angular.z = self.min_turn(turn, minimum=0.15)
-
-            # --- No obstacle detected: pass navigator command through ---
-            else:
-                final_cmd = self.goal_cmd
-
-        # Log (throttled) if we overrode
-        if obstacle_detected:
-            self.get_logger().info("Obstacle detected! Overriding goal.", throttle_duration_sec=1.0)
-
-        # Smooth
-        alpha = 0.5
+        # --- Smoothing and Publishing ---
+        # Smoothing helps prevent jerky movements
+        alpha = 0.6
         smooth_cmd = Twist()
         smooth_cmd.linear.x  = alpha * final_cmd.linear.x  + (1 - alpha) * self.prev_final_cmd.linear.x
         smooth_cmd.angular.z = alpha * final_cmd.angular.z + (1 - alpha) * self.prev_final_cmd.angular.z
 
         self.cmd_pub.publish(smooth_cmd)
         self.prev_final_cmd = smooth_cmd
+
+    def normalize_angle(self, angle): # <-- ADD THIS HELPER FUNCTION TO THE CLASS
+        while angle > math.pi: angle -= 2.0 * math.pi
+        while angle < -math.pi: angle += 2.0 * math.pi
+        return angle
 
 def main(args=None):
     rclpy.init(args=args)
